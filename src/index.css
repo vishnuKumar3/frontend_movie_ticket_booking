@@ -1,0 +1,11 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: custom-font;
+}
+
+@font-face{
+    font-family:custom-font;
+    src:url("Montserrat-Regular.ttf")
+}
