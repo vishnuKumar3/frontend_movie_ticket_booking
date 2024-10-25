@@ -10,6 +10,7 @@ import { FcGoogle } from "react-icons/fc";
 import {message} from "antd";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { LinearProgress } from "@mui/material";
 
 const theme:any = createTheme();
 const useStyles:any = makeStyles(()=>(
@@ -22,9 +23,28 @@ export default function Login(){
     const styles = useStyles();
     const [messageApi, contextHolder] = message.useMessage()
 		const [open, setOpen] = useState(false);
+    const [showProgress, setShowProgress] = useState(false);
 		const handleClose = ()=>{
 			setOpen(false);
 		}
+
+    const handleGoogleSignup = async (inputData:any)=>{
+      setShowProgress(true)
+      let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signup`,inputData,{
+          headers:{
+              "Content-Type":"application/json",
+          }
+      });
+      if(res){
+          setShowProgress(false);
+      }
+      if(res?.data?.status?.toLowerCase() === "success"){
+          messageApi.open({content:res?.data?.message,type:"success",duration:5})
+      }
+      else{
+          messageApi.open({content:res?.data?.message,type:"error",duration:5})
+      }        
+  }    
 
     const googleLogin:any = useGoogleLogin({
       onSuccess: async(codeResponse)=>{
@@ -32,8 +52,14 @@ export default function Login(){
           if(userData?.data?.email){
               console.log("user data",userData);
               let userInfo = {
-                  email:userData?.data?.email
+                email:userData?.data?.email,
+                firstName:userData?.data?.given_name,
+                lastName:userData?.data?.family_name,
+                avatarInfo:{
+                    Location:userData?.data?.picture
+                }
               }
+              handleGoogleSignup(userInfo)
           }
       },
       onError: (error:any) => {messageApi.open({type:"error","content":error,"duration":5})}
@@ -46,7 +72,9 @@ export default function Login(){
 							onClose={handleClose}
               fullWidth
 					>
+              {contextHolder}
 							<DialogTitle>
+              {showProgress && <LinearProgress/>}
                 <p style={{fontWeight:600,fontSize:"25px"}}>Signup</p>
 							</DialogTitle>
 							<DialogContent style={{display:"flex",flexDirection:"column",rowGap:"20px"}}>

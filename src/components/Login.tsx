@@ -9,7 +9,11 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
 import {message} from "antd";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { setUser } from "../reducers/user";
+import { useDispatch, UseDispatch } from "react-redux";
+import { LinearProgress } from "@mui/material";
+
 
 const theme:any = createTheme();
 const useStyles:any = makeStyles(()=>(
@@ -22,9 +26,37 @@ export default function Login(){
     const styles = useStyles();
     const [messageApi, contextHolder] = message.useMessage()
 		const [open, setOpen] = useState(false);
+    const [showProgress, setShowProgress] = useState(false);
+    const [cookies, setCookie, removeCookie] = useCookies()
+    const dispatch = useDispatch();
+
 		const handleClose = ()=>{
 			setOpen(false);
 		}
+
+    const handleSignin = async (formValues:any)=>{
+      setShowProgress(true)
+      let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/login`,formValues,{
+          headers:{
+              "Content-Type":"application/json",
+          }
+      });
+      if(res){
+          setShowProgress(false)
+      }
+      if(res?.data?.status?.toLowerCase() === "success"){
+          if(res?.data?.token){
+              let dateObj = new Date();
+              dateObj.setTime(dateObj.getTime()+(24*60*60*1000))
+              setCookie("accessToken",res?.data?.token,{expires:dateObj})
+          }
+          dispatch(setUser(res?.data?.userData));
+          messageApi.open({content:res?.data?.message,type:"success",duration:5})
+      }
+      else{
+          messageApi.open({content:res?.data?.message,type:"error",duration:5})
+      }
+  }    
 
     const googleLogin:any = useGoogleLogin({
       onSuccess: async(codeResponse)=>{
@@ -34,6 +66,7 @@ export default function Login(){
               let userInfo = {
                   email:userData?.data?.email
               }
+              handleSignin(userInfo);
           }
       },
       onError: (error:any) => {messageApi.open({type:"error","content":error,"duration":5})}
@@ -46,7 +79,9 @@ export default function Login(){
 							onClose={handleClose}
               fullWidth
 					>
+              {contextHolder}
 							<DialogTitle>
+                {showProgress && <LinearProgress/>}
                 <p style={{fontWeight:600,fontSize:"25px"}}>Login</p>
 							</DialogTitle>
 							<DialogContent style={{display:"flex",flexDirection:"column",rowGap:"20px"}}>

@@ -1,11 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 *{
     margin:0;
     padding:0;
     box-sizing: border-box;
     font-family: custom-font;
+    outline:none;
 }
 
 @font-face{
     font-family:custom-font;
-    src:url("Montserrat-Regular.ttf")
+    src:url("/Montserrat-Light.ttf")
 }
