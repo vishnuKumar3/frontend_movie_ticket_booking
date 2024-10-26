@@ -3,7 +3,7 @@ import { createTheme} from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import { useGoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
@@ -22,12 +22,17 @@ const useStyles:any = makeStyles(()=>(
 }
 ));
 
-export default function Login(){
+export default function Login(props:any){
     const styles = useStyles();
     const [messageApi, contextHolder] = message.useMessage()
-		const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(false);
     const [showProgress, setShowProgress] = useState(false);
     const [cookies, setCookie, removeCookie] = useCookies()
+
+    useEffect(()=>{
+        setOpen(props?.openLoginDialog);
+    },[props])
+
     const dispatch = useDispatch();
 
 		const handleClose = ()=>{
@@ -52,6 +57,7 @@ export default function Login(){
           }
           dispatch(setUser(res?.data?.userData));
           messageApi.open({content:res?.data?.message,type:"success",duration:5})
+          props?.setOpenLoginDialog(false);
       }
       else{
           messageApi.open({content:res?.data?.message,type:"error",duration:5})
@@ -75,8 +81,7 @@ export default function Login(){
     return(
         <>
 					<Dialog
-							open={true}
-							onClose={handleClose}
+							open={open}
               fullWidth
 					>
               {contextHolder}

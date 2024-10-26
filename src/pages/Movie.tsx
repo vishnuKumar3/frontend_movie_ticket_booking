@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { colors } from "../color_config"
 import { useDispatch } from "react-redux"
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fetchShowTheatres } from "../reducers/theatres";
 import { setTheatresList } from "../reducers/theatres";
 import { message } from "antd";
+import { useRef } from "react";
+import moment from "moment";
+import { setSelectedMovieId } from "../reducers/movies";
 
 export default function Movie(){
 
@@ -15,9 +18,15 @@ export default function Movie(){
   const pathParams:any = useParams();
   const [movieInfo, setMovieInfo]:any = useState({});
   const [messageApi, contextHolder] = message.useMessage();
+  const languages = useSelector((state:any)=>state.languages);
+  const [movieId, setMovieId] = useState("");
+  const [availableShowDates, setAvailableShowDates] = useState([]);
+  const [selectedShow, setSelectedShow] = useState("");
+  const navigate = useNavigate()
+  let payload:any = useRef();
 
-  const fetchMovieTheatreList = ()=>{
-    dispatch(fetchShowTheatres()).then((action:any)=>{
+  const fetchMovieTheatreList = (payload:any)=>{
+    dispatch(fetchShowTheatres(payload.current)).then((action:any)=>{
       if(action?.error){
         messageApi.error({content:action?.payload?.message, duration:5})
       }
@@ -29,11 +38,41 @@ export default function Movie(){
     })    
   }
 
+  const generateOneWeekTimingsFromCurrent = ()=>{
+    let momentObj = moment().startOf("day");
+    payload.current = {
+      movieId:pathParams?.movieId || "",
+      languageId:"",
+      showDate:"",
+    }
+
+    const requiredFormat = "YYYY-MM-DD";
+    let dates:any = [];
+    for(let i=0;i<7;i++){
+      momentObj = momentObj.add(i==0?i:1,"d");
+      let record = {
+        dateStr:momentObj.format(requiredFormat),
+        date:momentObj.format("DD"),
+        day:momentObj.day(momentObj.day())?.toString()?.slice(0,3)
+      }
+      if(i==0){
+        setSelectedShow(record?.dateStr)
+        payload.current["showDate"] = record?.dateStr;
+      }
+      dates.push(record);
+    }
+    setAvailableShowDates(dates);
+    payload.current["languageId"] = languages?.languagesList?.[0]?.languageId || ""
+    fetchMovieTheatreList(payload)
+  }
+
   useEffect(()=>{
     let moviesObject = movies?.moviesObject || {}; 
     console.log("movie page",moviesObject,pathParams)
     setMovieInfo(moviesObject[pathParams?.movieId] || {})
-    fetchMovieTheatreList()
+    dispatch(setSelectedMovieId(pathParams?.movieId));
+    setMovieId(pathParams?.movieId)
+    generateOneWeekTimingsFromCurrent()
   },[pathParams])
 
   const convertTime = (time:string)=>{
@@ -57,6 +96,18 @@ export default function Movie(){
     return res;
   }
 
+  const handleChangeInShow = (key:string, value:any)=>{
+    if(key === "showDate"){
+      setSelectedShow(value);
+    }
+    payload.current[key] = value;
+    fetchMovieTheatreList(payload)
+  } 
+
+  const handleShowSelection = (showId:string)=>{
+    navigate(`/seat-layout/${showId}`)
+  }
+
 
   return(
     <>
@@ -78,22 +129,54 @@ export default function Movie(){
             <p>{movieInfo.movieDescription}</p>
           </div>
         </div>
+        <div className="w-full flex flex-row justify-center">
+          <div style={{width:"90%"}} className="pt-5 flex flex-row justify-between items-center">
+            <div className="flex flex-row items-center gap-x-2">
+              {
+                availableShowDates.map((showDate:any)=>{
+                  const isSelected = selectedShow === showDate?.dateStr;
+                  return(
+                    <>
+                      <div onClick={()=>handleChangeInShow("showDate",showDate?.dateStr)} className="flex flex-col items-center p-2 gap-y-1 rounded-md cursor-pointer" style={{border:"1px solid black",color:isSelected?"white":"black",background:isSelected?"black":"white",width:"60px",fontSize:"13px",fontWeight:"600"}}>
+                        <p>{showDate?.day}</p>
+                        <p>{showDate?.date}</p>
+                      </div>
+                    </>
+                  )
+                })
+              }
+            </div>
+            <div>
+              <select name="languageId" onChange={(e:any)=>handleChangeInShow("languageId",e.target.value)} required className="rounded w-full" style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"50px",padding:"5px",background:"white"}}>
+                  {
+                    languages?.languagesList?.map((lanagugeInfo:any)=>{
+                      return(
+                      <>
+                        <option value={lanagugeInfo?.languageId}>{lanagugeInfo?.languageName}</option>
+                      </>
+                      )
+                    })
+                  }
+                </select>
+            </div>
+          </div>
+        </div>
         <div className="w-full flex flex-row justify-center pt-5">
-          <div className="flex flex-col items-center bg-black rounded-md" style={{width:"90%",border:`1px solid ${colors.borderGrayVariant}`,padding:"10px 0px 0px 0px",color:"#fffc"}}>
-            {theatres?.theatresList.map((theatreInfo:any)=>{
+          <div className="flex flex-col items-center justify-center bg-black rounded-md" style={{width:"90%",border:`1px solid ${colors.borderGrayVariant}`,padding:"10px 0px 10px 0px",color:"#fffc"}}>
+            {theatres?.theatresList?.length>0 ? theatres?.theatresList?.map((theatreData:any)=>{
               return(
                 <>
                   <hr style={{width:"100%",border:`1px solid #fff9`}}/>
                   <div className="flex flex-row items-center justify-between" style={{width:"95%",padding:"20px 0px"}}>
                     <div style={{width:"300px"}}>
-                      <p title={theatreInfo?.theatreName} style={{fontWeight:"bold",color:"#fffd",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{theatreInfo.theatreName}</p>
+                      <p title={theatreData?.theatreInfo?.theatreName} style={{fontWeight:"bold",color:"#fffd",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{theatreData?.theatreInfo?.theatreName}</p>
                     </div>
                     <div className="flex flex-row items-center gap-x-5">
                       {
-                        theatreInfo?.showTimings?.map((time:string)=>{
+                        theatreData?.showTimings?.map((time:string)=>{
                           return (
                             <>
-                              <p className="rounded-md cursor-pointer" style={{padding:"10px 20px",fontWeight:900,border:`1px solid white`,background:"black",color:"lime",}}>{convertTime(time)}</p>
+                              <p className="rounded-md cursor-pointer" onClick={()=>handleShowSelection(theatreData?.showId)} style={{padding:"10px 20px",fontWeight:900,border:`1px solid white`,background:"black",color:"lime",}}>{convertTime(time)}</p>
                             </>
                           )
                         })
@@ -102,7 +185,9 @@ export default function Movie(){
                   </div>
                 </>
               )
-            })}
+            }):
+              <p style={{fontWeight:"600",color:"white"}}>No Data</p>
+            }
           </div>
         </div>
       </div>

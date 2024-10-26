@@ -25,7 +25,7 @@ export default function Routes(){
                     element:<Movie/>
                 },
                 {
-                    path:"/seat-layout",
+                    path:"/seat-layout/:showId",
                     element:<SeatLayout/>
                 },
                 {

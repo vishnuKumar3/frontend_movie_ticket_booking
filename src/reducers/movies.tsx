@@ -6,7 +6,8 @@ const moviesReducer = createSlice({
   name:"movies",
   initialState:{
     moviesList:[],
-    moviesObject:{}
+    moviesObject:{},
+    selectedMovieId:""
   },
   reducers:{
     setMoviesList(state, action){
@@ -19,12 +20,17 @@ const moviesReducer = createSlice({
         return accumulator;
       },{})
       console.log("state",state.moviesObject)
+    },
+    setSelectedMovieId(state,action){
+      console.log("payload",action.payload)
+      state.selectedMovieId = action.payload || "";
     }
   }
 })
 
-export const {setMoviesList} = moviesReducer.actions;
+export const {setMoviesList, setSelectedMovieId} = moviesReducer.actions;
 export default moviesReducer.reducer;
+
 
 export const fetchMovies:any = createAsyncThunk("movies/fetchMovies",async function(data, thunkApi){
   try{
@@ -76,6 +82,42 @@ export const addShowData:any = createAsyncThunk("shows/addShowData",async functi
     return thunkApi.rejectWithValue({
       status:"error",
       message:"Error occurred while adding show data"
+    })
+  }
+})
+
+export const fetchShow:any = createAsyncThunk("shows/fetchShow",async function(data, thunkApi){
+  try{
+    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/shows/fetch-show`,data)
+    if(res?.data?.status?.toLowerCase() === "success"){
+      return thunkApi.fulfillWithValue(res?.data)
+    }
+    else{
+      return thunkApi.rejectWithValue(res.data)
+    }
+  }
+  catch(err){
+    return thunkApi.rejectWithValue({
+      status:"error",
+      message:"Error occurred while fetching show data"
+    })
+  }
+})
+
+export const seatBooking:any = createAsyncThunk("shows/seatBooking",async function(data, thunkApi){
+  try{
+    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/shows/book-tickets`,data)
+    if(res?.data?.status?.toLowerCase() === "success"){
+      return thunkApi.fulfillWithValue(res?.data)
+    }
+    else{
+      return thunkApi.rejectWithValue(res.data)
+    }
+  }
+  catch(err){
+    return thunkApi.rejectWithValue({
+      status:"error",
+      message:"Error occurred while seat booking"
     })
   }
 })

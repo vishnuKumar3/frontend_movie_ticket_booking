@@ -1,26 +1,25 @@
 import { useEffect,useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { colors } from "../color_config";
 import {message} from "antd"
+import { useParams } from "react-router-dom";
+import { fetchShow, seatBooking } from "../reducers/movies";
 
 export default function SeatLayout(){
-  const movieInfo = {
-    movieId:"1234",
-    name:"The GOAT",
-    releasedYear:2024,
-    duration:150,
-    rating:7.9,
-    ticketPrice:150,
-    language:"Telugu",
-    releaseDate:"12th Jan 2024",
-    description:"Consequences of an unknown past haunt the present of a special anti-terrorist squad. How will they confront it?"
-  };
+  const [movieInfo,setMovieInfo]:[any,any] = useState({}); 
 
   const [messageApi, contextHolder] = message.useMessage();
   const [selectedSeats, setSelectedSeats] = useState([])
   const [enableBookTicketsButton, setEnableBookTicketsButton] = useState(false);
+  const [showId, setShowId] = useState(""); 
+  const params = useParams();
+  const dispatch = useDispatch();
 
-  const [seatLayout, setSeatLayout] = useState([
+  const [showInfo, setShowInfo]:[any,any] = useState({});
+  const [seatLayout, setSeatLayout] = useState([]);
+  const movies = useSelector((state:any)=>state.movies);
+
+  /*[
     {
       "name":'C',
       "position":3,
@@ -36,16 +35,33 @@ export default function SeatLayout(){
       "position":2,
       "seats":[0,1,1,1,1,0,1,1,1,1,1]
     },        
-  ]);
-  useEffect(()=>{
-    let tempSeatLayout = JSON.parse(JSON.stringify(seatLayout));
+  ]*/
+
+  const arrangeSeats = (seatStructure:any)=>{
+    let tempSeatLayout = JSON.parse(JSON.stringify(seatStructure));
     tempSeatLayout.sort((a:any,b:any)=>{return (b?.position-a?.position)});
     setSeatLayout(tempSeatLayout);
-  },[])
+  }
 
   useEffect(()=>{
-    console.log("final",seatLayout);
-  },[seatLayout])
+    if(params?.showId){
+      setShowId(params?.showId)
+      const criteria={showId:params?.showId};
+      dispatch(fetchShow(criteria)).then((action:any)=>{
+        if(action?.error){
+          messageApi.error({content:action?.payload?.message, duration:5})
+        }
+        else{
+          setShowInfo(action?.payload?.showInfo);
+          setSeatLayout(action?.payload?.showInfo?.seatStructure)
+          arrangeSeats(action?.payload?.showInfo?.seatStructure);
+        }
+      }).catch((err:any)=>{
+        messageApi.error({content:err?.message, duration:5})
+      })     
+    }
+    setMovieInfo(movies.moviesObject[movies.selectedMovieId] || {});
+  },[params])
 
   useEffect(()=>{
     if(selectedSeats.length>0){
@@ -79,6 +95,20 @@ export default function SeatLayout(){
         <p style={{fontSize:"15px",fontWeight:500}}>{title}</p>
       </div>
     )
+  }
+
+  const submitSeatBooking = ()=>{
+    let payload = {userId:"671a832f5c57b3102da8edc1",showId:showId,selectedSeats:selectedSeats};
+    dispatch(seatBooking(payload)).then((action:any)=>{
+      if(action?.error){
+        messageApi.error({content:action?.payload?.message, duration:5})
+      }
+      else{
+        messageApi.success({content:action?.payload?.message, duration:5})
+      }
+    }).catch((err:any)=>{
+      messageApi.error({content:err?.message, duration:5})
+    })    
   }
 
   const bookTickets = (rowName:string, selectedSeat:number)=>{
@@ -164,7 +194,7 @@ export default function SeatLayout(){
       {contextHolder}
       <div style={{height:'calc(100vh - 60px)',width:"100%"}}>
         <div className="flex flex-row items-center justify-between p-5" style={{borderBottom:`1px solid ${colors.borderGrayVariant}`}}>
-          <p style={{fontSize:"20px",fontWeight:700}}>{movieInfo.name}</p>
+          <p style={{fontSize:"20px",fontWeight:700}}>{movieInfo?.movieName || ""}</p>
           <div className="flex flex-row items-center gap-x-3">
             {
               seatInfo.map((info:any)=>{
@@ -179,19 +209,20 @@ export default function SeatLayout(){
         </div>
         <div className="w-full flex flex-col items-center pt-10 gap-y-4" style={{overflowY:"scroll"}}>
           {enableBookTicketsButton && <div className="w-full flex flex-row-reverse items-center justify-start pr-5" style={{fontWeight:"bold",fontSize:"18px"}}>
-            <button className="bg-black text-white rounded-md" style={{padding:"10px 20px",border:"none",fontSize:"15px",fontWeight:"bold"}}>
+            <button onClick={submitSeatBooking} className="bg-black text-white rounded-md" style={{padding:"10px 20px",border:"none",fontSize:"15px",fontWeight:"bold"}}>
                 Book Tickets
             </button>
           </div>}
-          <div className="w-full pt-3 pb-5 flex flex-row items-center justify-center" style={{fontWeight:"bold",fontSize:"18px"}}>Executive Class : ₹ {movieInfo.ticketPrice}</div>
+          <div className="w-full pt-3 pb-5 flex flex-row items-center justify-center" style={{fontWeight:"bold",fontSize:"18px"}}>Executive Class : ₹ {showInfo?.ticketPrice || ""}</div>
             {
-              seatLayout.map((seatRow:any)=>{
+              seatLayout?.length>0 ? seatLayout?.map((seatRow:any)=>{
                 return(
                   <>
                     {seatRowComponent(seatRow)}
                   </>
                 )
-              })
+              }):
+              <p style={{fontWeight:"600"}}>No Data</p>
             }
         </div>
         <div className="flex flex-row items-center justify-center p-6 w-full" style={{position:"fixed",bottom:0, left:0, right:0,border:`1px solid ${colors.borderGrayVariant}`}}>

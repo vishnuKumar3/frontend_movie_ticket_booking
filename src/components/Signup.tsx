@@ -10,6 +10,7 @@ import { FcGoogle } from "react-icons/fc";
 import {message} from "antd";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { LinearProgress } from "@mui/material";
 
 const theme:any = createTheme();
@@ -19,7 +20,7 @@ const useStyles:any = makeStyles(()=>(
 }
 ));
 
-export default function Login(){
+export default function Signup(props:any){
     const styles = useStyles();
     const [messageApi, contextHolder] = message.useMessage()
 		const [open, setOpen] = useState(false);
@@ -27,6 +28,10 @@ export default function Login(){
 		const handleClose = ()=>{
 			setOpen(false);
 		}
+
+    useEffect(()=>{
+      setOpen(props?.openSignupDialog);
+    },[props])    
 
     const handleGoogleSignup = async (inputData:any)=>{
       setShowProgress(true)
@@ -40,6 +45,7 @@ export default function Login(){
       }
       if(res?.data?.status?.toLowerCase() === "success"){
           messageApi.open({content:res?.data?.message,type:"success",duration:5})
+          props?.setOpenSignupDialog(false);
       }
       else{
           messageApi.open({content:res?.data?.message,type:"error",duration:5})
@@ -68,8 +74,7 @@ export default function Login(){
     return(
         <>
 					<Dialog
-							open={true}
-							onClose={handleClose}
+							open={open}
               fullWidth
 					>
               {contextHolder}
