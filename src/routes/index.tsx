@@ -7,6 +7,8 @@ import MainMenu from "../pages/MainMenu.tsx";
 import Movie from "../pages/Movie.tsx";
 import SeatLayout from "../pages/SeatLayout.tsx";
 import MovieManagement from "../pages/MovieManagement.tsx"
+import TheatreManagement from "../pages/TheatreManagement.tsx";
+import ShowManagement from "../pages/ShowManagement.tsx";
 
 export default function Routes(){
     return useRoutes([
@@ -29,7 +31,15 @@ export default function Routes(){
                 {
                     path:"/movie-management",
                     element:<MovieManagement/>
-                }
+                },
+                {
+                    path:"/theatre-management",
+                    element:<TheatreManagement/>
+                },
+                {
+                    path:"/show-management",
+                    element:<ShowManagement/>
+                }                                      
             ]
         },
         {

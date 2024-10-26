@@ -1,6 +1,7 @@
 import { useEffect,useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { fetchLanguages, fetchMovies } from "../reducers/movies";
+import { fetchMovies } from "../reducers/movies";
+import { fetchLanguages } from "../reducers/languages";
 import {message} from "antd"
 import { setMoviesList } from "../reducers/movies";
 import MovieCard from "../components/MovieCard";
@@ -27,7 +28,16 @@ export default function Home(){
       messageApi.error({content:err?.message, duration:5})
     })
 
-    dispatch(fetchLanguages())    
+    dispatch(fetchLanguages()).then((action:any)=>{
+      if(action?.error){
+        messageApi.error({content:action?.payload?.message, duration:5})
+      }
+      else{
+        //we just need to trigger alert when there is an error
+      }
+      }).catch((err:any)=>{
+        messageApi.error({content:err?.message, duration:5})
+      })    
   },[])
 
   useEffect(()=>{
@@ -37,13 +47,18 @@ export default function Home(){
   return(
       <>
         {contextHolder}
-        {movies.moviesList.map((movieInfo:any)=>{
-          return (
-            <>
-              <MovieCard movieInfo={movieInfo}/>
-            </>
-          )
-        })}
+        <div className="flex flex-col items-start gap-y-3 p-5">
+          <h2>Trending Movies</h2>
+          <div className="flex flex-row flex-wrap items-center gap-x-5 pt-5">
+            {movies.moviesList.map((movieInfo:any)=>{
+              return (
+                <>
+                  <MovieCard movieInfo={movieInfo}/>
+                </>
+              )
+            })}
+          </div>
+        </div>
       </>
   )
 }

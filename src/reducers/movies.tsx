@@ -6,7 +6,7 @@ const moviesReducer = createSlice({
   name:"movies",
   initialState:{
     moviesList:[],
-    moviesObject:{},
+    moviesObject:{}
   },
   reducers:{
     setMoviesList(state, action){
@@ -44,9 +44,9 @@ export const fetchMovies:any = createAsyncThunk("movies/fetchMovies",async funct
   }
 })
 
-export const fetchLanguages:any = createAsyncThunk("movies/fetchLanguages",async function(data, thunkApi){
+export const addMovieData:any = createAsyncThunk("movies/addMovieData",async function(data, thunkApi){
   try{
-    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/languages/fetch-languages`,data)
+    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/movies/add-movie`,data)
     if(res?.data?.status?.toLowerCase() === "success"){
       return thunkApi.fulfillWithValue(res?.data)
     }
@@ -57,7 +57,25 @@ export const fetchLanguages:any = createAsyncThunk("movies/fetchLanguages",async
   catch(err){
     return thunkApi.rejectWithValue({
       status:"error",
-      message:"Error occurred while fetching languages list"
+      message:"Error occurred while adding movie info"
+    })
+  }
+})
+
+export const addShowData:any = createAsyncThunk("shows/addShowData",async function(data, thunkApi){
+  try{
+    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/shows/add-show`,data)
+    if(res?.data?.status?.toLowerCase() === "success"){
+      return thunkApi.fulfillWithValue(res?.data)
+    }
+    else{
+      return thunkApi.rejectWithValue(res.data)
+    }
+  }
+  catch(err){
+    return thunkApi.rejectWithValue({
+      status:"error",
+      message:"Error occurred while adding show data"
     })
   }
 })
