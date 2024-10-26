@@ -5,6 +5,7 @@ import Signup from "../components/Signup.tsx"
 import MovieCard from "../components/MovieCard.tsx";
 import MainMenu from "../pages/MainMenu.tsx";
 import Movie from "../pages/Movie.tsx";
+import SeatLayout from "../pages/SeatLayout.tsx";
 
 export default function Routes(){
     return useRoutes([
@@ -19,6 +20,10 @@ export default function Routes(){
                 {
                     path:"/movie/:movieId",
                     element:<Movie/>
+                },
+                {
+                    path:"/seat-layout",
+                    element:<SeatLayout/>
                 }
             ]
         },

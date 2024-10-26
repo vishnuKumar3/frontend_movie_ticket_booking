@@ -8,6 +8,20 @@ import { setTheatresList } from "../reducers/theatres";
 import { message } from "antd";
 
 export default function Movie(){
+
+  const response = {
+    status:'success',
+    movies:[{
+    movieId:"1234",
+    name:"The GOAT",
+    releasedYear:2024,
+    duration:150,
+    rating:7.9,
+    language:"Telugu",
+    releaseDate:"12th Jan 2024",
+    description:"Consequences of an unknown past haunt the present of a special anti-terrorist squad. How will they confront it?"
+  }]};  
+
   const dispatch = useDispatch(); 
   const movies = useSelector((state:any)=>state.movies);
   const theatres = useSelector((state:any)=>state.theatres);
