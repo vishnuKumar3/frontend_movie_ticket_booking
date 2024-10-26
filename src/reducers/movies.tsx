@@ -43,3 +43,21 @@ export const fetchMovies:any = createAsyncThunk("movies/fetchMovies",async funct
     })
   }
 })
+
+export const fetchLanguages:any = createAsyncThunk("movies/fetchLanguages",async function(data, thunkApi){
+  try{
+    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/languages/fetch-languages`,data)
+    if(res?.data?.status?.toLowerCase() === "success"){
+      return thunkApi.fulfillWithValue(res?.data)
+    }
+    else{
+      return thunkApi.rejectWithValue(res.data)
+    }
+  }
+  catch(err){
+    return thunkApi.rejectWithValue({
+      status:"error",
+      message:"Error occurred while fetching languages list"
+    })
+  }
+})

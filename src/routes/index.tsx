@@ -6,6 +6,7 @@ import MovieCard from "../components/MovieCard.tsx";
 import MainMenu from "../pages/MainMenu.tsx";
 import Movie from "../pages/Movie.tsx";
 import SeatLayout from "../pages/SeatLayout.tsx";
+import MovieManagement from "../pages/MovieManagement.tsx"
 
 export default function Routes(){
     return useRoutes([
@@ -24,6 +25,10 @@ export default function Routes(){
                 {
                     path:"/seat-layout",
                     element:<SeatLayout/>
+                },
+                {
+                    path:"/movie-management",
+                    element:<MovieManagement/>
                 }
             ]
         },

@@ -5,6 +5,7 @@ import { persistReducer } from "redux-persist";
 import userReducer from "../reducers/user.tsx"
 import movieReducer from "../reducers/movies.tsx";
 import theatresReducer from "../reducers/theatres.tsx";
+import languagesReducer from "../reducers/languages.tsx"
 
 const persistConfig = {
     key: "root",
@@ -15,7 +16,8 @@ const persistConfig = {
 const combinedReducers = combineReducers({
     user:userReducer,
     movies:movieReducer,
-    theatres:theatresReducer
+    theatres:theatresReducer,
+    languages: languagesReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, combinedReducers)
