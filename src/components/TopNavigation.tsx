@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { colors } from "../color_config";
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
+import { useMemo } from "react";
 import * as React from 'react';
 import Login from "./Login";
 import Signup from "./Signup"
@@ -68,6 +69,9 @@ export default function TopNavigation(){
       </>
     )
   }
+  
+  const ProfileImage = useMemo(()=> <img src={user?.userData?.avatarInfo?.Location} style={{borderRadius:"100%",width:"30px",height:"30px",cursor:"pointer"}}/>,[user?.userData]);
+
 
   const redirectToPage = (path:any)=>{
     navigate(path);
@@ -92,7 +96,7 @@ export default function TopNavigation(){
         </div>
         {(cookies?.accessToken) ?
           <div onClick={handleClick} className="flex flex-row items-center gap-x-3 pr-5">
-            <img src={user?.userData?.avatarInfo?.Location} style={{borderRadius:"100%",width:"30px",height:"30px"}}/>
+            {ProfileImage}
             <div className="flex flex-row items-center gap-x-1">
               <p className="cursor-pointer font-bold capitalize">{user?.userData?.firstName}</p>
               <p className="cursor-pointer font-bold">{user?.userData?.firstName}</p>

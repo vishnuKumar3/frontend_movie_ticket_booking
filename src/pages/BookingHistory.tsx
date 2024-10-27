@@ -30,10 +30,10 @@ const fetchPastBookings = ()=>{
   return(
     <>
       {contextHolder}
-      <div className="flex flex-row items-center justify-center mt-5">
+      <div className="flex flex-row items-center justify-center mt-5 w-full">
         <p style={{fontWeight:600,fontSize:"20px"}}>Booking History</p>
       </div>
-      <div className="w-full flex flex-row items-center gap-x-3 gap-y-3 mt-5 p-5">
+      <div className="w-full flex flex-row items-center gap-x-3 gap-y-3 mt-5 p-5 w-full">
         {bookingHistory?.length>0 ? 
         bookingHistory?.map((booking:any)=>{
           return(
@@ -61,9 +61,9 @@ const fetchPastBookings = ()=>{
             </>
           )
         }):
-        <div className="flex flex-row items-center justify-center">
-          <p style={{fontWeight:600}}>
-            No Booking History found
+        <div className="flex flex-row items-center justify-center w-full">
+          <p style={{fontWeight:600,fontSize:"18px"}}>
+            No Data
           </p>
         </div>
       }
