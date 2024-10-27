@@ -1,4 +1,5 @@
 <h1>MoTick(movie ticket management)(React+Vite)</h1>
+<a href="https://motick.netlify.app">https://motick.netlify.app/</a>
 <h2>Installation process</h2>
 <p>Run <b>npm install or npm install --legacy-peer-deps</b></p> 
 <p>Now run <b>npm run dev</b>, then webapp will automatically open</p>    
