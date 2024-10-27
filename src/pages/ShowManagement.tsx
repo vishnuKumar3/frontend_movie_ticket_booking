@@ -1,5 +1,5 @@
 import {message} from "antd"
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { addShowData, fetchMovies } from "../reducers/movies";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTheatres } from "../reducers/theatres";
@@ -7,6 +7,7 @@ import { setMoviesList } from "../reducers/movies";
 import { fetchLanguages } from "../reducers/languages";
 import { useFormik } from "formik";
 import { colors } from "../color_config";
+import moment from "moment";
 
 export default function ShowManagement(){
   const [messageApi, contextHolder] = message.useMessage();
@@ -14,6 +15,8 @@ export default function ShowManagement(){
   const movies = useSelector((state:any)=>state.movies);
   const theatres = useSelector((state:any)=>state.theatres);
   const languages = useSelector((state:any)=>state.languages);
+  const [minDateToStart, setMinDateToStart] = useState("");
+  const [minDateForEndsOn, setMinDateForEndsOn] = useState("");
 
   const titleComponent = (title:string)=>{ 
     return(<>
@@ -119,6 +122,13 @@ export default function ShowManagement(){
     },
   });   
 
+  useEffect(()=>{
+    console.log("movieId",formik.values.movieId);
+    let movieInfo = movies?.moviesObject?.[formik.values.movieId] || {};
+    setMinDateToStart(moment(movieInfo?.releaseDate).format("YYYY-MM-DD"));
+    setMinDateForEndsOn(moment(movieInfo?.releaseDate).format("YYYY-MM-DD"));
+  },[formik.values.movieId])
+
   return(
     <>
       {contextHolder}
@@ -128,6 +138,7 @@ export default function ShowManagement(){
           <div className="flex flex-col justify-start gap-y-2 w-full">
             {titleComponent("MovieName")}
             <select name="movieId" onChange={formik.handleChange} required className="rounded w-full" style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px",background:"white"}}>
+              <option disabled selected value="">Select an option</option>              
               {
                 movies?.moviesList?.map((movieInfo:any)=>{
                   return(
@@ -142,6 +153,7 @@ export default function ShowManagement(){
           <div className="flex flex-col justify-start gap-y-2 w-full">
             {titleComponent("TheatreName")}
             <select name="theatreId" onChange={formik.handleChange} required className="rounded w-full" style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px",background:"white"}}>
+              <option disabled selected value="">Select an option</option> 
               {
                 theatres?.theatresList?.map((theatreInfo:any)=>{
                   return(
@@ -156,6 +168,7 @@ export default function ShowManagement(){
           <div className="flex flex-col justify-start gap-y-2 w-full">
             {titleComponent("Language")}
             <select name="languageId" onChange={formik.handleChange} required className="rounded w-full" style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px",background:"white"}}>
+              <option disabled selected value="">Select an option</option> 
               {
                 languages?.languagesList?.map((lanagugeInfo:any)=>{
                   return(
@@ -169,7 +182,14 @@ export default function ShowManagement(){
           </div>    
           {combinedComponent(titleComponent("TicketPrice"),inputComponent("number","ticketPrice",true))}
           {combinedComponent(titleComponent("StartsFrom"),inputComponent("date","startsFrom",true))}
-          {combinedComponent(titleComponent("EndsOn"),inputComponent("date","endsOn",true))}
+          <div className="flex flex-col justify-start gap-y-2 w-full">
+            {titleComponent("StartsFrom")}
+            <input type={"date"} onChange={formik.handleChange} min={minDateToStart} required className="rounded w-full" name={"startsFrom"} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>            
+          </div>             
+          <div className="flex flex-col justify-start gap-y-2 w-full">
+            {titleComponent("EndsOn")}
+            <input type={"date"} onChange={formik.handleChange} min={minDateForEndsOn} required className="rounded w-full" name={"endsOn"} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>            
+          </div>     
           {combinedComponent(titleComponent("ShowTime"),inputComponent("time","showTime",true))}    
           <div className="flex flex-row items-center justify-center mt-5 w-full">
             <input type="submit" value="submit" className="rounded cursor-pointer" style={{border:"none",textTransform:"capitalize",padding:"5px 20px",background:"black",color:"white",fontSize:"15px",fontWeight:700}}/>                       

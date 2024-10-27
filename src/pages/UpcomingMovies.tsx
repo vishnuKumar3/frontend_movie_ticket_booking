@@ -5,9 +5,9 @@ import { fetchLanguages } from "../reducers/languages";
 import {message} from "antd"
 import { setMoviesList } from "../reducers/movies";
 import MovieCard from "../components/MovieCard";
-import moment from "moment";
+import moment from "moment"
 
-export default function Home(){
+export default function UpcomingMovies(){
   const dispatch = useDispatch();
   const userData = useSelector((state:any)=>state.user);
   const [messageApi, contextHolder] = message.useMessage();
@@ -22,9 +22,8 @@ export default function Home(){
   },[])
 
   useEffect(()=>{
-    let oldDate = moment().subtract(30,"d").format("YYYY-MM-DD");
-    let currentDate = moment().format("YYYY-MM-DD");
-    dispatch(fetchMovies({startsFrom:currentDate, startsBefore:oldDate})).then((action:any)=>{
+    let currentDate = moment().format("YYYY-MM-DD")
+    dispatch(fetchMovies({startsFrom:currentDate})).then((action:any)=>{
       if(action?.error){
         messageApi.error({content:action?.payload?.message, duration:5})
       }
@@ -48,17 +47,20 @@ export default function Home(){
   },[])
 
   useEffect(()=>{
+    console.log("movies",movies)
+  },[movies])
+
+  useEffect(()=>{
       console.log("user data",userData.userId)
   },[userData])
 
   return(
       <>
         {contextHolder}
-        <div className="flex flex-col items-start gap-y-3 p-5">
-          <h2>Trending Movies</h2>
+        <div className="flex flex-col items-start gap-y-3 p-5 w-full">
+          <h2>Upcoming Movies</h2>
           <div className="flex flex-row flex-wrap items-center gap-x-5 pt-5 w-full">
-            {movies?.moviesList?.length>0 ? 
-            movies.moviesList.map((movieInfo:any)=>{
+            {movies?.moviesList?.length>0 ? movies?.moviesList?.map((movieInfo:any)=>{
               return (
                 <>
                   <MovieCard movieInfo={movieInfo}/>
@@ -67,8 +69,8 @@ export default function Home(){
             }):
             <div className="w-full flex flex-row justify-center items-center">
               <p style={{fontWeight:700,fontSize:"20px"}}>No Data</p>
-            </div>            
-            }
+            </div>
+          }
           </div>
         </div>
       </>

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import interceptor from "../interceptor/interceptor";
 
 const moviesReducer = createSlice({
   name:"movies",
@@ -106,7 +107,7 @@ export const fetchShow:any = createAsyncThunk("shows/fetchShow",async function(d
 
 export const seatBooking:any = createAsyncThunk("shows/seatBooking",async function(data, thunkApi){
   try{
-    let res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/shows/book-tickets`,data)
+    let res = await interceptor.post(`${import.meta.env.VITE_BACKEND_URL}/shows/book-tickets`,data)
     if(res?.data?.status?.toLowerCase() === "success"){
       return thunkApi.fulfillWithValue(res?.data)
     }
@@ -118,6 +119,24 @@ export const seatBooking:any = createAsyncThunk("shows/seatBooking",async functi
     return thunkApi.rejectWithValue({
       status:"error",
       message:"Error occurred while seat booking"
+    })
+  }
+})
+
+export const fetchBookings:any = createAsyncThunk("bookings/fetchBooking",async function(data, thunkApi){
+  try{
+    let res = await interceptor.post(`${import.meta.env.VITE_BACKEND_URL}/userBookings/fetch-user-bookings`,data)
+    if(res?.data?.status?.toLowerCase() === "success"){
+      return thunkApi.fulfillWithValue(res?.data)
+    }
+    else{
+      return thunkApi.rejectWithValue(res.data)
+    }
+  }
+  catch(err){
+    return thunkApi.rejectWithValue({
+      status:"error",
+      message:"Error occurred while fetching booking history"
     })
   }
 })

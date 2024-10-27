@@ -9,6 +9,9 @@ import SeatLayout from "../pages/SeatLayout.tsx";
 import MovieManagement from "../pages/MovieManagement.tsx"
 import TheatreManagement from "../pages/TheatreManagement.tsx";
 import ShowManagement from "../pages/ShowManagement.tsx";
+import BookingHistory from "../pages/BookingHistory.tsx";
+import UpcomingMovies from "../pages/UpcomingMovies.tsx";
+import AdminPanel from "../pages/AdminPanel.tsx";
 
 export default function Routes(){
     return useRoutes([
@@ -19,6 +22,10 @@ export default function Routes(){
                 {   
                     path:"/",
                     element:<Home/>
+                },
+                {
+                    path:"/upcoming-movies",
+                    element:<UpcomingMovies/>
                 },
                 {
                     path:"/movie/:movieId",
@@ -39,6 +46,14 @@ export default function Routes(){
                 {
                     path:"/show-management",
                     element:<ShowManagement/>
+                },
+                {
+                    path:"/booking-history",
+                    element:<BookingHistory/>
+                },
+                {
+                    path:"/admin-panel",
+                    element:<AdminPanel/>
                 }                                      
             ]
         },

@@ -4,6 +4,7 @@ import { colors } from "../color_config";
 import {message} from "antd"
 import { useParams } from "react-router-dom";
 import { fetchShow, seatBooking } from "../reducers/movies";
+import { useCookies } from "react-cookie";
 
 export default function SeatLayout(){
   const [movieInfo,setMovieInfo]:[any,any] = useState({}); 
@@ -14,6 +15,8 @@ export default function SeatLayout(){
   const [showId, setShowId] = useState(""); 
   const params = useParams();
   const dispatch = useDispatch();
+  const user = useSelector((state:any)=>state.user);
+  const [cookies, setCookie, removeCookies] = useCookies();
 
   const [showInfo, setShowInfo]:[any,any] = useState({});
   const [seatLayout, setSeatLayout] = useState([]);
@@ -98,17 +101,22 @@ export default function SeatLayout(){
   }
 
   const submitSeatBooking = ()=>{
-    let payload = {userId:"671a832f5c57b3102da8edc1",showId:showId,selectedSeats:selectedSeats};
-    dispatch(seatBooking(payload)).then((action:any)=>{
-      if(action?.error){
-        messageApi.error({content:action?.payload?.message, duration:5})
-      }
-      else{
-        messageApi.success({content:action?.payload?.message, duration:5})
-      }
-    }).catch((err:any)=>{
-      messageApi.error({content:err?.message, duration:5})
-    })    
+    if(cookies?.accessToken){
+      let payload = {selectedSeats:selectedSeats};
+      dispatch(seatBooking(payload)).then((action:any)=>{
+        if(action?.error){
+          messageApi.error({content:action?.payload?.message, duration:5})
+        }
+        else{
+          messageApi.success({content:action?.payload?.message, duration:5})
+        }
+      }).catch((err:any)=>{
+        messageApi.error({content:err?.message, duration:5})
+      })    
+    }
+    else{
+      messageApi.info({content:"Please login to continue",duration:5});
+    }
   }
 
   const bookTickets = (rowName:string, selectedSeat:number)=>{
@@ -209,7 +217,7 @@ export default function SeatLayout(){
         </div>
         <div className="w-full flex flex-col items-center pt-10 gap-y-4" style={{overflowY:"scroll"}}>
           {enableBookTicketsButton && <div className="w-full flex flex-row-reverse items-center justify-start pr-5" style={{fontWeight:"bold",fontSize:"18px"}}>
-            <button onClick={submitSeatBooking} className="bg-black text-white rounded-md" style={{padding:"10px 20px",border:"none",fontSize:"15px",fontWeight:"bold"}}>
+            <button onClick={submitSeatBooking} className="cursor-pointer bg-black text-white rounded-md" style={{padding:"10px 20px",border:"none",fontSize:"15px",fontWeight:"bold"}}>
                 Book Tickets
             </button>
           </div>}
