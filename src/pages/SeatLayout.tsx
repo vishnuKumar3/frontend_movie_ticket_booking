@@ -5,8 +5,11 @@ import {message} from "antd"
 import { useParams } from "react-router-dom";
 import { fetchShow, seatBooking } from "../reducers/movies";
 import { useCookies } from "react-cookie";
+import { useMediaQuery } from "@mui/material";
+import {createTheme} from "@mui/material/styles"
 
 export default function SeatLayout(){
+  const theme = createTheme();
   const [movieInfo,setMovieInfo]:[any,any] = useState({}); 
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -17,6 +20,7 @@ export default function SeatLayout(){
   const dispatch = useDispatch();
   const user = useSelector((state:any)=>state.user);
   const [cookies, setCookie, removeCookies] = useCookies();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [showInfo, setShowInfo]:[any,any] = useState({});
   const [seatLayout, setSeatLayout] = useState([]);
@@ -102,7 +106,7 @@ export default function SeatLayout(){
 
   const submitSeatBooking = ()=>{
     if(cookies?.accessToken){
-      let payload = {selectedSeats:selectedSeats};
+      let payload = {selectedSeats:selectedSeats,showId:showId};
       dispatch(seatBooking(payload)).then((action:any)=>{
         if(action?.error){
           messageApi.error({content:action?.payload?.message, duration:5})
@@ -200,8 +204,8 @@ export default function SeatLayout(){
   return(
     <>
       {contextHolder}
-      <div style={{height:'calc(100vh - 60px)',width:"100%"}}>
-        <div className="flex flex-row items-center justify-between p-5" style={{borderBottom:`1px solid ${colors.borderGrayVariant}`}}>
+      <div style={{height:'calc(100vh - 60px)',width:"100%",overflow:"scroll"}}>
+        <div className="flex flex-col sm:flex-row gap-y-5 items-center justify-between p-5" style={{borderBottom:`1px solid ${colors.borderGrayVariant}`}}>
           <p style={{fontSize:"20px",fontWeight:700}}>{movieInfo?.movieName || ""}</p>
           <div className="flex flex-row items-center gap-x-3">
             {
@@ -215,13 +219,13 @@ export default function SeatLayout(){
             }
           </div>
         </div>
-        <div className="w-full flex flex-col items-center pt-10 gap-y-4" style={{overflowY:"scroll"}}>
+        <div className="w-full flex flex-col items-start sm:items-center pt-10 pl-5 pr-5 gap-y-4 pb-16" style={{height:"calc(100vh - 250px)",overflowY:"scroll",overflowX:mobile?"scroll":"initial",zIndex:-1}}>
           {enableBookTicketsButton && <div className="w-full flex flex-row-reverse items-center justify-start pr-5" style={{fontWeight:"bold",fontSize:"18px"}}>
             <button onClick={submitSeatBooking} className="cursor-pointer bg-black text-white rounded-md" style={{padding:"10px 20px",border:"none",fontSize:"15px",fontWeight:"bold"}}>
                 Book Tickets
             </button>
           </div>}
-          <div className="w-full pt-3 pb-5 flex flex-row items-center justify-center" style={{fontWeight:"bold",fontSize:"18px"}}>Executive Class : ₹ {showInfo?.ticketPrice || ""}</div>
+          <div className="w-max pt-3 pb-5 flex flex-row items-center justify-center" style={{fontWeight:"bold",fontSize:"18px"}}>Executive Class : ₹ {showInfo?.ticketPrice || ""}</div>
             {
               seatLayout?.length>0 ? seatLayout?.map((seatRow:any)=>{
                 return(
@@ -233,7 +237,7 @@ export default function SeatLayout(){
               <p style={{fontWeight:"600"}}>No Data</p>
             }
         </div>
-        <div className="flex flex-row items-center justify-center p-6 w-full" style={{position:"fixed",bottom:0, left:0, right:0,border:`1px solid ${colors.borderGrayVariant}`}}>
+        <div className="flex flex-row items-center justify-center p-6 w-full" style={{position:"fixed",bottom:0, left:0, right:0,border:`1px solid ${colors.borderGrayVariant}`,background:"white",zIndex:10}}>
             <img src="/screen.svg"/>
         </div>
       </div>

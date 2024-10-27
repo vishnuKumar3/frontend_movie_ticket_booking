@@ -9,9 +9,9 @@ import { addMovieData } from "../reducers/movies"
 
 export default function MovieManagement(){
     const [miniPoster, setMiniPoster] = useState();
-    const [miniPosterName, setMiniPosterName] = useState({});
+    const [miniPosterName, setMiniPosterName] = useState("");
     const [bigPoster, setBigPoster] = useState();
-    const [bigPosterName, setBigPosterName] = useState({});
+    const [bigPosterName, setBigPosterName] = useState("");
     const [messageApi, contextHolder] = message.useMessage()
     const dispatch = useDispatch();
 
@@ -24,7 +24,7 @@ export default function MovieManagement(){
     const inputComponent = (type:string, name:string,required:boolean)=>{
       return(
         <>
-          <input type={type} onChange={formik.handleChange} required={required} className="rounded w-full" name={name} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>
+          <input type={type} value={formik.values[name]} onChange={formik.handleChange} required={required} className="rounded w-full" name={name} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>
         </>
       )
     }
@@ -54,7 +54,13 @@ export default function MovieManagement(){
       setBigPoster(files?.[0] || {})
     }    
 
-    const generateFormDataAndSubmit = (values:any)=>{
+    const clearForm = (resetForm:any)=>{
+      resetForm();
+      setMiniPosterName("");
+      setBigPosterName("");
+    }
+
+    const generateFormDataAndSubmit = (values:any, resetForm:any)=>{
       const formData = new FormData();
       Object.entries(values).map(([key,value]:[any,any])=>{
         if(key?.toLowerCase() === "languageIDs"){
@@ -75,6 +81,7 @@ export default function MovieManagement(){
           messageApi.error({content:action?.payload?.message, duration:5})
         }
         else{
+          clearForm(resetForm)
           messageApi.success({content:action?.payload?.message,duration:5})
         }
       }).catch((err:any)=>{
@@ -92,10 +99,11 @@ export default function MovieManagement(){
         releaseDate:"",
         languageIDs:[]
       },
-      onSubmit: (values:any) => {
+      onSubmit: (values:any,{resetForm}) => {
         console.log(miniPoster, bigPoster)
         console.log("form values",values);
-        generateFormDataAndSubmit(values);
+        generateFormDataAndSubmit(values, resetForm);
+        
       },
     });    
 
@@ -130,10 +138,12 @@ export default function MovieManagement(){
           <div className="flex flex-col justify-start gap-y-2 w-full pt-2">
             <label style={{color:"black",fontWeight:600,fontSize:"15px"}} className="cursor-pointer flex flex-row items-center gap-x-2" htmlFor="movieMiniPoster" ><i style={{fontSize:"20px"}} className="fa fa-cloud-upload"></i> Upload Movie Mini Poster</label>
             <input id="movieMiniPoster" accept='image/*' onChange={(e)=>handleMiniPosterUpload(e)} className="z-0 hidden absolute opacity-0" type="file"/>
+            {miniPosterName && <p style={{color:"lime",fontWeight:600,fontSize:"15px"}}>{miniPosterName}</p>}
           </div>  
           <div className="flex flex-col justify-start gap-y-2 w-full pt-2">
             <label style={{color:"black",fontWeight:600,fontSize:"15px"}} className="cursor-pointer flex flex-row items-center gap-x-2" htmlFor="movieLargePoster" ><i style={{fontSize:"20px"}} className="fa fa-cloud-upload"></i> Upload Movie Large Poster</label>
             <input id="movieLargePoster" accept='image/*' onChange={(e)=>handleBigPosterUpload(e)} className="z-0 hidden absolute opacity-0" type="file"/>
+            {bigPosterName && <p style={{color:"lime",fontWeight:600,fontSize:"15px"}}>{bigPosterName}</p>}
           </div>    
           <div className="flex flex-row items-center justify-center mt-5 w-full">
             <input type="submit" value="submit" className="rounded cursor-pointer" style={{border:"none",textTransform:"capitalize",padding:"5px 20px",background:"black",color:"white",fontSize:"15px",fontWeight:700}}/>                       

@@ -51,7 +51,7 @@ export default function TheatreManagement(){
       }
     }
 
-    const formatDataAndSubmit = (values:any)=>{
+    const formatDataAndSubmit = (values:any, resetForm:any)=>{
       if(validateJson(values?.seatStructure)){
         values["seatStructure"] = JSON.parse(values["seatStructure"])
         setSubmissionError("");
@@ -60,6 +60,7 @@ export default function TheatreManagement(){
             messageApi.error({content:action?.payload?.message, duration:5})
           }
           else{
+            resetForm();
             messageApi.success({content:action?.payload?.message,duration:5})
           }
         }).catch((err:any)=>{
@@ -75,9 +76,9 @@ export default function TheatreManagement(){
         location:"",
         seatStructure:{}
       },
-      onSubmit: (values:any) => {
+      onSubmit: (values:any,{resetForm}) => {
         console.log("values",values)
-        formatDataAndSubmit(values);
+        formatDataAndSubmit(values, resetForm);
       },
     });    
 
@@ -93,7 +94,7 @@ export default function TheatreManagement(){
           <p style={{fontSize:"15px",fontWeight:600,textDecoration:"underline", color:"blue"}} onClick={()=>makeJSONDownloadable(SAMPLE_SEAT_STRUCTURE,"sample_seat_structure")}>Download Sample Seat Structure</p>               
           <div className="flex flex-col justify-start gap-y-2 w-full">
             {titleComponent("SeatStructure")}
-            <textarea required onChange={formik.handleChange} style={{width:"full",padding:"5px",fontWeight:600,height:"200px",border:`1px solid ${colors.borderGrayVariant}}`}} name="seatStructure">
+            <textarea value={formik.values["seatStructure"]} required onChange={formik.handleChange} style={{width:"full",padding:"5px",fontWeight:600,height:"200px",border:`1px solid ${colors.borderGrayVariant}}`}} name="seatStructure">
 
             </textarea>
           </div>

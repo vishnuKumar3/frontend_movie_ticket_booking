@@ -3,12 +3,16 @@ import { colors } from "../color_config"
 import { useDispatch } from "react-redux"
 import { fetchBookings } from "../reducers/movies"
 import {message} from "antd";
+import { useMediaQuery } from "@mui/material";
+import {createTheme} from "@mui/material/styles"
 import moment from "moment";
 
 export default function BookingHistory(){
+  const theme = createTheme();
   const dispatch = useDispatch()
   const [messageApi,contextHolder] = message.useMessage()
   const [bookingHistory,setBookingHistory] = useState([]);
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));
 
 const fetchPastBookings = ()=>{
   dispatch(fetchBookings()).then((action:any)=>{
@@ -38,13 +42,13 @@ const fetchPastBookings = ()=>{
         bookingHistory?.map((booking:any)=>{
           return(
             <>
-            <div className="flex flex-row items-center gap-x-2 bg-black" style={{width:"400px"}}>
+            <div className="flex flex-row items-center gap-x-2 bg-black" style={{width:mobile?"320px":"400px"}}>
               <img style={{width:"100px",height:"150px"}} src={booking?.movieInfo?.miniPoster?.Location}/>
               <div style={{width:"300px",height:"150px",overflow:"hidden"}} className="text-white rounded flex flex-col items-start gap-y-1 pl-3 pt-3 bg-black">
-                <p style={{fontWeight:600,fontSize:"18px",color:colors.greenVariant,whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}} title={booking?.movieInfo?.movieName}>{booking?.movieInfo?.movieName}</p>
-                <p style={{fontWeight:600,fontSize:"15px",whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}} title={booking?.theatreInfo?.theatreName}>{booking?.theatreInfo?.theatreName}</p>
-                <p style={{fontWeight:600,fontSize:"15px",whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}}>Booked For: {moment(booking?.showDate).isValid()?moment(booking?.showDate).format("YYYY-MM-DD"):""}</p>
-                <p className="flex flex-row flex-wrap items-center gap-x-1" style={{fontWeight:600,fontSize:"15px",whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}}>Seats:
+                <p style={{fontWeight:600,fontSize:mobile?"15px":"18px",color:colors.greenVariant,whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}} title={booking?.movieInfo?.movieName}>{booking?.movieInfo?.movieName}</p>
+                <p style={{fontWeight:600,fontSize:mobile?"13px":"15px",whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}} title={booking?.theatreInfo?.theatreName}>{booking?.theatreInfo?.theatreName}</p>
+                <p style={{fontWeight:600,fontSize:mobile?"13px":"15px",whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}}>Booked For: {moment(booking?.showDate).isValid()?moment(booking?.showDate).format("YYYY-MM-DD"):""}</p>
+                <p className="flex flex-row flex-wrap items-center gap-x-1" style={{fontWeight:600,fontSize:mobile?"13px":"15px",whiteSpace:"nowrap",textOverflow:"ellipsis",overflow:"hidden"}}>Seats:
                   {booking?.selectedSeats?.map((seatInfo:any)=>{
                     return(
                     <>

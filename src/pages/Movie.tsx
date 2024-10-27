@@ -9,9 +9,12 @@ import { message } from "antd";
 import { useRef } from "react";
 import moment from "moment";
 import { setSelectedMovieId } from "../reducers/movies";
+import { useMediaQuery } from "@mui/material";
+import {createTheme} from "@mui/material/styles"
 
 export default function Movie(){
 
+  const theme = createTheme();
   const dispatch = useDispatch(); 
   const movies = useSelector((state:any)=>state.movies);
   const theatres = useSelector((state:any)=>state.theatres);
@@ -24,6 +27,7 @@ export default function Movie(){
   const [selectedShow, setSelectedShow] = useState("");
   const navigate = useNavigate()
   let payload:any = useRef();
+  const mobile = useMediaQuery(theme.breakpoints.down("md"));  
 
   const fetchMovieTheatreList = (payload:any)=>{
     dispatch(fetchShowTheatres(payload.current)).then((action:any)=>{
@@ -113,13 +117,13 @@ export default function Movie(){
     <>
       <div className="w-full pb-10">
         {contextHolder}
-        <div style={{backgroundImage:`url(${movieInfo?.bigPoster?.Location || "goat-poster.avif"})`,width:"100%",height:"500px",backgroundPosition:"center",backgroundRepeat:"no-repeat",backgroundSize:"100%"}}>
-          <div className="flex flex-row items-start" style={{background:"linear-gradient(to right,black,#0000)",width:"100%",height:"500px",color:"white"}}>
-            <div className="h-full flex flex-col gap-y-3 justify-center ml-24">
+        <div style={{backgroundImage:`url(${movieInfo?.bigPoster?.Location || "goat-poster.avif"})`,width:"100%",height:mobile?"200px":"500px",backgroundPosition:"center",backgroundRepeat:"no-repeat",backgroundSize:"100%"}}>
+          <div className="flex flex-row items-start" style={{background:"linear-gradient(to right,black,#0000)",width:"100%",height:mobile?"200px":"500px",color:"white"}}>
+            <div className="h-full flex flex-col gap-y-3 justify-center ml-5 sm:ml-24">
               <h1 style={{color:colors.greenVariant}}>{movieInfo.movieName}</h1>
               <p className="flex flex-row items-center gap-x-2"><i className="fa fa-language"></i><span>U/A Telugu</span></p>
               <p className="flex flex-row items-center gap-x-2"><i className="fa fa-clock-o"></i><span>{movieInfo.duration} min</span></p>
-              <button style={{background:colors.greenVariant,color:"black",padding:"10px 20px",border:"none",fontWeight:600,fontSize:"15px"}} className="flex flex-row items-center mt-5 cursor-pointer gap-x-2 rounded-md cursor-pointer justify-center"><i className="fa fa-play-circle-o"></i>Watch Trailer</button>
+              {mobile && <button style={{background:colors.greenVariant,color:"black",padding:mobile?"5px 10px":"10px 20px",border:"none",fontWeight:600,fontSize:mobile?"13px":"15px"}} className="flex flex-row items-center mt-5 cursor-pointer gap-x-2 rounded-md cursor-pointer justify-center"><i className="fa fa-play-circle-o"></i>Watch Trailer</button>}
             </div>
           </div>        
         </div>
@@ -129,15 +133,16 @@ export default function Movie(){
             <p>{movieInfo.movieDescription}</p>
           </div>
         </div>
-        <div className="w-full flex flex-row justify-center">
-          <div style={{width:"90%"}} className="pt-5 flex flex-row justify-between items-center">
-            <div className="flex flex-row items-center gap-x-2">
+        <div className="w-full flex flex-row justify-center pt-5 pb-5"><p style={{fontWeight:"bold",fontSize:"20px"}}>Book Tickets</p></div>
+        <div className="w-full flex flex-wrap justify-center">
+          <div className="w-11/12 sm:w-11/12 pt-5 flex flex-col-reverse sm:flex-row justify-between items-center gap-y-8">
+            <div className="flex flex-row flex-wrap gap-y-3 items-center gap-x-2">
               {
                 availableShowDates.map((showDate:any)=>{
                   const isSelected = selectedShow === showDate?.dateStr;
                   return(
                     <>
-                      <div onClick={()=>handleChangeInShow("showDate",showDate?.dateStr)} className="flex flex-col items-center p-2 gap-y-1 rounded-md cursor-pointer" style={{border:"1px solid black",color:isSelected?"white":"black",background:isSelected?"black":"white",width:"60px",fontSize:"13px",fontWeight:"600"}}>
+                      <div onClick={()=>handleChangeInShow("showDate",showDate?.dateStr)} className="flex flex-col items-center p-1 sm:p-2 gap-y-1 rounded-md cursor-pointer" style={{border:"1px solid black",color:isSelected?"white":"black",background:isSelected?"black":"white",width:"60px",fontSize:"13px",fontWeight:"600"}}>
                         <p>{showDate?.day}</p>
                         <p>{showDate?.date}</p>
                       </div>
@@ -146,7 +151,7 @@ export default function Movie(){
                 })
               }
             </div>
-            <div>
+            <div className="w-40">
               <select name="languageId" onChange={(e:any)=>handleChangeInShow("languageId",e.target.value)} required className="rounded w-full" style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"50px",padding:"5px",background:"white"}}>
                   {
                     languages?.languagesList?.map((lanagugeInfo:any)=>{
@@ -162,13 +167,13 @@ export default function Movie(){
           </div>
         </div>
         <div className="w-full flex flex-row justify-center pt-5">
-          <div className="flex flex-col items-center justify-center bg-black rounded-md" style={{width:"90%",border:`1px solid ${colors.borderGrayVariant}`,padding:"10px 0px 10px 0px",color:"#fffc"}}>
+          <div className="flex flex-col items-center justify-center bg-black rounded-md w-11/12" style={{border:`1px solid ${colors.borderGrayVariant}`,padding:"10px 0px 10px 0px",color:"#fffc"}}>
             {theatres?.theatresList?.length>0 ? theatres?.theatresList?.map((theatreData:any)=>{
               return(
                 <>
                   <hr style={{width:"100%",border:`1px solid #fff9`}}/>
-                  <div className="flex flex-row items-center justify-between" style={{width:"95%",padding:"20px 0px"}}>
-                    <div style={{width:"300px"}}>
+                  <div className="flex flex-col sm:flex-row gap-y-5 items-start sm:items-center justify-between" style={{width:"95%",padding:"20px 0px"}}>
+                    <div style={{width:mobile?"100%":"300px"}}>
                       <p title={theatreData?.theatreInfo?.theatreName} style={{fontWeight:"bold",color:"#fffd",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{theatreData?.theatreInfo?.theatreName}</p>
                     </div>
                     <div className="flex flex-row items-center gap-x-5">
@@ -176,7 +181,7 @@ export default function Movie(){
                         theatreData?.showTimings?.map((time:string)=>{
                           return (
                             <>
-                              <p className="rounded-md cursor-pointer" onClick={()=>handleShowSelection(theatreData?.showId)} style={{padding:"10px 20px",fontWeight:900,border:`1px solid white`,background:"black",color:"lime",}}>{convertTime(time)}</p>
+                              <p className="rounded-md cursor-pointer" onClick={()=>handleShowSelection(theatreData?.showId)} style={{padding:mobile?"5px 10px":"10px 20px",fontSize:mobile?"13px":"auto",fontWeight:900,border:`1px solid white`,background:"black",color:"lime",}}>{convertTime(time)}</p>
                             </>
                           )
                         })

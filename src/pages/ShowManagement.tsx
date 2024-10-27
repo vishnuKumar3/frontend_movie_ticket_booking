@@ -27,7 +27,7 @@ export default function ShowManagement(){
   const inputComponent = (type:string, name:string,required:boolean)=>{
     return(
       <>
-        <input type={type} onChange={formik.handleChange} required={required} className="rounded w-full" name={name} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>
+        <input type={type} value={formik.values[name]} onChange={formik.handleChange} required={required} className="rounded w-full" name={name} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>
       </>
     )
   }
@@ -93,12 +93,13 @@ export default function ShowManagement(){
     console.log("movies list",movies?.moviesList)
   },[movies])
 
-  const formatDataAndSubmit = (values:any)=>{
+  const formatDataAndSubmit = (values:any, resetForm:any)=>{
     dispatch(addShowData(values)).then((action:any)=>{
       if(action?.error){
         messageApi.error({content:action?.payload?.message, duration:5})
       }
       else{
+        resetForm();
         messageApi.success({content:action?.payload?.message, duration:5})             
       }
     }).catch((err:any)=>{
@@ -116,9 +117,9 @@ export default function ShowManagement(){
       showTime:"",
       ticketPrice:""
     },
-    onSubmit: (values:any) => {
+    onSubmit: (values:any,{resetForm}) => {
       console.log("values",values)
-      formatDataAndSubmit(values);
+      formatDataAndSubmit(values, resetForm);
     },
   });   
 
@@ -181,14 +182,13 @@ export default function ShowManagement(){
             </select>
           </div>    
           {combinedComponent(titleComponent("TicketPrice"),inputComponent("number","ticketPrice",true))}
-          {combinedComponent(titleComponent("StartsFrom"),inputComponent("date","startsFrom",true))}
           <div className="flex flex-col justify-start gap-y-2 w-full">
             {titleComponent("StartsFrom")}
-            <input type={"date"} onChange={formik.handleChange} min={minDateToStart} required className="rounded w-full" name={"startsFrom"} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>            
+            <input type={"date"} value={formik.values["startsFrom"]} onChange={formik.handleChange} min={minDateToStart} required className="rounded w-full" name={"startsFrom"} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>            
           </div>             
           <div className="flex flex-col justify-start gap-y-2 w-full">
             {titleComponent("EndsOn")}
-            <input type={"date"} onChange={formik.handleChange} min={minDateForEndsOn} required className="rounded w-full" name={"endsOn"} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>            
+            <input type={"date"} onChange={formik.handleChange} min={minDateForEndsOn} required className="rounded w-full" value={formik.values["endsOn"]} name={"endsOn"} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>            
           </div>     
           {combinedComponent(titleComponent("ShowTime"),inputComponent("time","showTime",true))}    
           <div className="flex flex-row items-center justify-center mt-5 w-full">

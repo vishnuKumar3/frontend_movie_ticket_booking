@@ -12,6 +12,7 @@ import ShowManagement from "../pages/ShowManagement.tsx";
 import BookingHistory from "../pages/BookingHistory.tsx";
 import UpcomingMovies from "../pages/UpcomingMovies.tsx";
 import AdminPanel from "../pages/AdminPanel.tsx";
+import AuthGuard from "../components/AuthGuard.tsx";
 
 export default function Routes(){
     return useRoutes([
@@ -37,15 +38,24 @@ export default function Routes(){
                 },
                 {
                     path:"/movie-management",
-                    element:<MovieManagement/>
+                    element:(
+                    <AuthGuard>
+                        <MovieManagement/>
+                    </AuthGuard>)
                 },
                 {
                     path:"/theatre-management",
-                    element:<TheatreManagement/>
+                    element:(
+                    <AuthGuard>
+                        <TheatreManagement/>
+                    </AuthGuard>)
                 },
                 {
                     path:"/show-management",
-                    element:<ShowManagement/>
+                    element:(
+                        <AuthGuard>
+                            <ShowManagement/>
+                        </AuthGuard>)
                 },
                 {
                     path:"/booking-history",
@@ -53,7 +63,10 @@ export default function Routes(){
                 },
                 {
                     path:"/admin-panel",
-                    element:<AdminPanel/>
+                    element:(
+                        <AuthGuard>
+                            <AdminPanel/>
+                        </AuthGuard>)
                 }                                      
             ]
         },
