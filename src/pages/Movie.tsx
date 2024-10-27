@@ -123,7 +123,7 @@ export default function Movie(){
               <h1 style={{color:colors.greenVariant}}>{movieInfo.movieName}</h1>
               <p className="flex flex-row items-center gap-x-2"><i className="fa fa-language"></i><span>U/A Telugu</span></p>
               <p className="flex flex-row items-center gap-x-2"><i className="fa fa-clock-o"></i><span>{movieInfo.duration} min</span></p>
-              {mobile && <button style={{background:colors.greenVariant,color:"black",padding:mobile?"5px 10px":"10px 20px",border:"none",fontWeight:600,fontSize:mobile?"13px":"15px"}} className="flex flex-row items-center mt-5 cursor-pointer gap-x-2 rounded-md cursor-pointer justify-center"><i className="fa fa-play-circle-o"></i>Watch Trailer</button>}
+              {!mobile && <button style={{background:colors.greenVariant,color:"black",padding:mobile?"5px 10px":"10px 20px",border:"none",fontWeight:600,fontSize:mobile?"13px":"15px"}} className="flex flex-row items-center mt-5 cursor-pointer gap-x-2 rounded-md cursor-pointer justify-center"><i className="fa fa-play-circle-o"></i>Watch Trailer</button>}
             </div>
           </div>        
         </div>
