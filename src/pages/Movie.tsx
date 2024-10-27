@@ -178,10 +178,10 @@ export default function Movie(){
                     </div>
                     <div className="flex flex-row items-center gap-x-5">
                       {
-                        theatreData?.showTimings?.map((time:string)=>{
+                        theatreData?.showTimings?.map((time:any)=>{
                           return (
                             <>
-                              <p className="rounded-md cursor-pointer" onClick={()=>handleShowSelection(theatreData?.showId)} style={{padding:mobile?"5px 10px":"10px 20px",fontSize:mobile?"13px":"auto",fontWeight:900,border:`1px solid white`,background:"black",color:"lime",}}>{convertTime(time)}</p>
+                              <p className="rounded-md cursor-pointer" onClick={()=>handleShowSelection(time?.showId || "")} style={{padding:mobile?"5px 10px":"10px 20px",fontSize:mobile?"13px":"auto",fontWeight:900,border:`1px solid white`,background:"black",color:"lime",}}>{convertTime(time?.showTime || "")}</p>
                             </>
                           )
                         })

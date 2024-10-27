@@ -24,7 +24,7 @@ export default function TheatreManagement(){
     const inputComponent = (type:string, name:string,required:boolean)=>{
       return(
         <>
-          <input type={type} onChange={formik.handleChange} required={required} className="rounded w-full" name={name} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>
+          <input type={type} value={formik.values[name]} onChange={formik.handleChange} required={required} className="rounded w-full" name={name} style={{fontWeight:600,border:`1px solid ${colors.inputGrayVariant}`,height:"30px",padding:"5px"}}/>
         </>
       )
     }
